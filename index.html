@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang='pt-br'>
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+  <title>PetPassport — Guia de Viagem Internacional</title>
+  <script src='https://cdn.tailwindcss.com'></script>
+  <link href='https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap' rel='stylesheet'/>
+  <style>
+    :root { --cream: #F5F0E8; --forest: #1C3A2B; --sage: #4A7C59; --gold: #C9A84C; }
+    body { font-family: 'DM Sans', sans-serif; background-color: var(--cream); color: var(--forest); }
+    .hero-title { font-family: 'Playfair Display', serif; font-weight: 900; }
+    .route-card { transition: all 0.2s; border: 1px solid rgba(74,124,89,0.1); }
+    .route-card:hover { transform: translateY(-2px); border-color: var(--gold); background: white; }
+  </style>
+</head>
+<body class='p-8'>
+  <div class='max-w-4xl mx-auto'>
+    <header class='mb-12 text-center'>
+      <h1 class='hero-title text-6xl mb-4'>PetPassport</h1>
+      <p class='text-xl opacity-80'>Encontre os requisitos para viajar com seu pet.</p>
+    </header>
+    <div class='bg-white p-8 rounded-3xl shadow-2xl mb-12'>
+      <input type='text' id='searchInput' placeholder='Digite a origem, destino ou animal...' 
+             class='w-full p-6 text-xl border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-sage bg-slate-50'>
+      <div id='results' class='grid grid-cols-1 gap-3 mt-8'></div>
+    </div>
+  </div>
+  <script>
+    let routes = [];
+    const searchInput = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('results');
+    fetch('routes.json').then(r => r.json()).then(data => { routes = data; }).catch(() => console.log('routes.json not found'));
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      resultsDiv.innerHTML = '';
+      if (query.length < 2) return;
+      const filtered = routes.filter(r => r.includes(query)).slice(0, 10);
+      filtered.forEach(slug => {
+        const label = slug.replace(/-/g, ' ').toUpperCase();
+        const link = document.createElement('a');
+        link.href = `routes/${slug}.html`;
+        link.className = 'route-card p-5 rounded-2xl bg-white flex justify-between items-center text-decoration-none';
+        link.innerHTML = `<span class='font-medium text-slate-700'>${label}</span><span class='text-sage text-xl'>→</span>`;
+        resultsDiv.appendChild(link);
+      });
+    });
+  </script>
+</body>
+</html>
